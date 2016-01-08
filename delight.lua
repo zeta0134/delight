@@ -23,15 +23,19 @@ function delight.newFileData(filename)
 end
 
 function delight.writeImage(object, filename)
+  local png, error = delight.getPngData(object)
+  if error then return error end
+  local file, error = io.open(filename, 'wb')
+  if error then return error end
+  file:write(png)
+  file:close()
+end
+
+function delight.getPngData(object)
   if object:typeOf('Image') then object = object:getData() end
   if object:typeOf('ImageData') then object = object:encode('png') end
-  if object:typeOf('FileData') then object = object:getString() end
-  local file, error = io.open(filename, 'wb')
-  if file then
-    file:write(object)
-    file:close()
-  end
-  return error
+  if object:typeOf('FileData') then return object:getString() end
+  return nil, 'Invalid type'
 end
 
 return delight
